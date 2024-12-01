@@ -1,14 +1,24 @@
-import { IsNotEmpty } from "class-validator";
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
+export class CreateMovieDto {
+  @IsNotEmpty()
+  title: string;
 
-export class CreateMovieDto{
-    
-    @IsNotEmpty()
-    title: string;
+  @IsNotEmpty()
+  @IsString()
+  detail: string;
 
-    @IsNotEmpty()
-    genre: string;
+  @IsNotEmpty()
+  directorId: number;
 
-    @IsNotEmpty()
-    detail: string; 
+  @IsArray()
+  @ArrayNotEmpty()
+  @IsNumber({}, { each: true })
+  genreIds: number[];
 }

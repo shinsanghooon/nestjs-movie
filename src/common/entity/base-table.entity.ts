@@ -1,12 +1,15 @@
-import { CreateDateColumn, UpdateDateColumn, VersionColumn } from "typeorm";
+import { Exclude } from 'class-transformer';
+import { CreateDateColumn, UpdateDateColumn, VersionColumn } from 'typeorm';
 
 export class BaseTable {
-    @CreateDateColumn()
-    createdAt: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 
-    @UpdateDateColumn()
-    updatedAt: Date;
+  @UpdateDateColumn()
+  @Exclude()
+  updatedAt: Date;
 
-    @VersionColumn()
-    version: number; 
+  @VersionColumn()
+  @Exclude()
+  version: number;
 }
