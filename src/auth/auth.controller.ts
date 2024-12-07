@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
+import { Public } from './decorator/public.decorator';
 import { LocalAuthGuard } from './strategy/local.strategy';
 
 @Controller('auth')
@@ -14,11 +15,13 @@ export class AuthController {
     private userRepository: Repository<User>,
   ) {}
 
+  @Public()
   @Post('register')
   async registerUser(@Headers('authorization') token: string) {
     return this.authService.register(token);
   }
 
+  @Public()
   @Post('login')
   async loginUser(@Headers('authorization') token: string) {
     return this.authService.login(token);

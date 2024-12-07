@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { CommonService } from 'src/common/common.service';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
-import { DataSource, In, Like, Repository } from 'typeorm';
+import { DataSource, In, Like, QueryRunner, Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieDetail } from './entity/movie-detail.entity';
 import { Movie } from './entity/movie.entity';
@@ -24,10 +26,12 @@ export class MovieService {
     @InjectRepository(Genre)
     private readonly genreRepository: Repository<Genre>,
     private readonly dataSource: DataSource,
+    private readonly commonService: CommonService,
   ) {}
 
-  async getMovies(title: string) {
-    console.log(title);
+  async getMovies(dto: GetMoviesDto) {
+    const { title } = dto;
+
     if (!title) {
       return [
         await this.movieRepository.find({ relations: ['director', 'genres'] }),
@@ -43,7 +47,9 @@ export class MovieService {
     });
   }
 
-  async findAll(title: string) {
+  async findAll(dto: GetMoviesDto) {
+    const { title } = dto;
+
     const qb = this.movieRepository
       .createQueryBuilder('movie')
       .leftJoinAndSelect('movie.director', 'director')
@@ -53,7 +59,17 @@ export class MovieService {
       qb.where('movie.title LIKE :title', { title: `%${title}%` });
     }
 
-    return await qb.getMany();
+    // this.commonService.applyPagePaginationParamsToQb(qb, dto);
+    const { nextCursor } =
+      await this.commonService.applyCursorPaginationParamsToQb(qb, dto);
+
+    const [data, count] = await qb.getManyAndCount();
+
+    return {
+      data,
+      nextCursor,
+      count,
+    };
   }
 
   async getMovieById(id: number) {
@@ -87,48 +103,34 @@ export class MovieService {
     return movie;
   }
 
-  async createMovie(createMovieDto: CreateMovieDto) {
-    const qr = this.dataSource.createQueryRunner();
+  async createMovie(createMovieDto: CreateMovieDto, qr: QueryRunner) {
+    const director = await qr.manager.findOne(Director, {
+      where: { id: createMovieDto.directorId },
+    });
 
-    await qr.connect();
-    await qr.startTransaction();
-
-    try {
-      const director = await qr.manager.findOne(Director, {
-        where: { id: createMovieDto.directorId },
-      });
-
-      if (!director) {
-        throw new NotFoundException('존재하지 않는 감독입니다.');
-      }
-
-      const genres = await qr.manager.find(Genre, {
-        where: { id: In(createMovieDto.genreIds) },
-      });
-      console.log(genres);
-
-      if (genres.length !== createMovieDto.genreIds.length) {
-        throw new NotFoundException('존재하지 않는 장르입니다.');
-      }
-
-      const movie = await qr.manager.save(Movie, {
-        title: createMovieDto.title,
-        detail: {
-          detail: createMovieDto.detail,
-        },
-        director,
-        genres,
-      });
-
-      await qr.commitTransaction();
-
-      return movie;
-    } catch (e) {
-      await qr.rollbackTransaction();
-      throw e;
-    } finally {
-      await qr.release();
+    if (!director) {
+      throw new NotFoundException('존재하지 않는 감독입니다.');
     }
+
+    const genres = await qr.manager.find(Genre, {
+      where: { id: In(createMovieDto.genreIds) },
+    });
+    console.log(genres);
+
+    if (genres.length !== createMovieDto.genreIds.length) {
+      throw new NotFoundException('존재하지 않는 장르입니다.');
+    }
+
+    const movie = await qr.manager.save(Movie, {
+      title: createMovieDto.title,
+      detail: {
+        detail: createMovieDto.detail,
+      },
+      director,
+      genres,
+    });
+
+    return movie;
   }
 
   async updateMovie(id: number, updateMovieDto: UpdateMovieDto) {

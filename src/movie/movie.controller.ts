@@ -13,25 +13,29 @@ import {
   Request,
   UseInterceptors,
 } from '@nestjs/common';
+import { Public } from 'src/auth/decorator/public.decorator';
+import { RBAC } from 'src/auth/decorator/rbac.decorator';
+import { CacheInterceptor } from 'src/common/interceptor/cache.interceptor';
+import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { Role } from 'src/user/entities/user.entity';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
-import { MovieTitleValidationPipe } from './pipe/movie-title-validation.pipe';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor)
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
 
+  @Public()
   @Get()
-  getManyMovies(
-    @Request() req: any,
-    @Query('title', MovieTitleValidationPipe) title?: string,
-  ) {
-    console.log(req.user);
-    return this.movieService.getMovies(title);
+  @UseInterceptors(CacheInterceptor)
+  getManyMovies(@Query() dto: GetMoviesDto) {
+    return this.movieService.findAll(dto);
   }
 
+  @Public()
   @Get(':id')
   getMovie(
     @Param('id', ParseIntPipe)
@@ -43,16 +47,20 @@ export class MovieController {
   }
 
   @Post()
-  postMovie(@Body() body: CreateMovieDto) {
-    return this.movieService.createMovie(body);
+  @RBAC(Role.admin)
+  @UseInterceptors(TransactionInterceptor)
+  postMovie(@Body() body: CreateMovieDto, @Request() req) {
+    return this.movieService.createMovie(body, req.queryRunner);
   }
 
   @Patch(':id')
+  @RBAC(Role.admin)
   patchMovie(@Param('id') id: string, @Body() updateMovieDto: UpdateMovieDto) {
     return this.movieService.updateMovie(+id, updateMovieDto);
   }
 
   @Delete(':id')
+  @RBAC(Role.admin)
   deleteMovie(@Param('id') id: string) {
     return this.movieService.deleteMovie(+id);
   }
