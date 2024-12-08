@@ -1,3 +1,4 @@
+import { Transform, Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
   IsArray,
@@ -15,10 +16,16 @@ export class CreateMovieDto {
   detail: string;
 
   @IsNotEmpty()
+  @IsNumber()
   directorId: number;
 
   @IsArray()
   @ArrayNotEmpty()
   @IsNumber({}, { each: true })
+  @Type(() => Number)
   genreIds: number[];
+
+  @IsString()
+  @Transform(({ value }) => `http://localhost:3000/${value}`)
+  movieFileName: string;
 }

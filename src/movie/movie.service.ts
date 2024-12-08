@@ -1,5 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { rename } from 'fs/promises';
+import { join } from 'path';
 import { CommonService } from 'src/common/common.service';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
@@ -115,17 +117,25 @@ export class MovieService {
     const genres = await qr.manager.find(Genre, {
       where: { id: In(createMovieDto.genreIds) },
     });
-    console.log(genres);
 
     if (genres.length !== createMovieDto.genreIds.length) {
       throw new NotFoundException('존재하지 않는 장르입니다.');
     }
+
+    const movieFolder = join('public', 'movie');
+    const tempFolder = join('public', 'temp');
+
+    await rename(
+      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
+      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
+    );
 
     const movie = await qr.manager.save(Movie, {
       title: createMovieDto.title,
       detail: {
         detail: createMovieDto.detail,
       },
+      movieFilePath: join(movieFolder, createMovieDto.movieFileName),
       director,
       genres,
     });

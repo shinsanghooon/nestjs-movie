@@ -65,3 +65,9 @@ export class MovieController {
     return this.movieService.deleteMovie(+id);
   }
 }
+function FileFieldInterceptor(
+  arg0: { name: string; maxCount: number }[],
+  arg1: { fileFilter(req: any, file: any, callback: any): any },
+): Function | import('@nestjs/common').NestInterceptor<any, any> {
+  throw new Error('Function not implemented.');
+}
