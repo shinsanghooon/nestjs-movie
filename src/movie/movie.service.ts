@@ -105,7 +105,11 @@ export class MovieService {
     return movie;
   }
 
-  async createMovie(createMovieDto: CreateMovieDto, qr: QueryRunner) {
+  async createMovie(
+    createMovieDto: CreateMovieDto,
+    qr: QueryRunner,
+    userId: number,
+  ) {
     const director = await qr.manager.findOne(Director, {
       where: { id: createMovieDto.directorId },
     });
@@ -125,11 +129,6 @@ export class MovieService {
     const movieFolder = join('public', 'movie');
     const tempFolder = join('public', 'temp');
 
-    await rename(
-      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
-      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
-    );
-
     const movie = await qr.manager.save(Movie, {
       title: createMovieDto.title,
       detail: {
@@ -139,6 +138,11 @@ export class MovieService {
       director,
       genres,
     });
+
+    await rename(
+      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
+      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
+    );
 
     return movie;
   }
