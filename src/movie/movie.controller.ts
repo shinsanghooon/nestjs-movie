@@ -1,4 +1,9 @@
 import {
+  CacheKey,
+  CacheTTL,
+  CacheInterceptor as CI,
+} from '@nestjs/cache-manager';
+import {
   Body,
   ClassSerializerInterceptor,
   Controller,
@@ -38,7 +43,11 @@ export class MovieController {
   }
 
   @Get('recent')
+  @UseInterceptors(CI) // 자동으로 엔드포인트의 결과를 캐싱한다. 쿼리파라미터가 있으면 다른 캐시로 저장된다.
+  @CacheKey('getMoviesRecent') // 이렇게 하면 모든 캐시가 같은 키에 저장되기 때문에 쿼리파라미터에 영향을 안받는다
+  @CacheTTL(1000) // module에서 적용한 설정은 오버라이딩 한다.
   getMoviesRecent() {
+    console.log('Executes Get Movies Recent!');
     return this.movieService.findRecent();
   }
 
