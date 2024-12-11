@@ -33,8 +33,13 @@ export class MovieController {
   @Public()
   @Get()
   @UseInterceptors(CacheInterceptor)
-  getManyMovies(@Query() dto: GetMoviesDto) {
-    return this.movieService.findAll(dto);
+  getManyMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
+    return this.movieService.findAll(dto, userId);
+  }
+
+  @Get('recent')
+  getMoviesRecent() {
+    return this.movieService.findRecent();
   }
 
   @Public()
@@ -44,7 +49,6 @@ export class MovieController {
     id: number,
     @Query('test', new DefaultValuePipe(10)) test: number,
   ) {
-    console.log(test);
     return this.movieService.getMovieById(id);
   }
 
@@ -70,10 +74,20 @@ export class MovieController {
   deleteMovie(@Param('id') id: string) {
     return this.movieService.deleteMovie(+id);
   }
-}
-function FileFieldInterceptor(
-  arg0: { name: string; maxCount: number }[],
-  arg1: { fileFilter(req: any, file: any, callback: any): any },
-): Function | import('@nestjs/common').NestInterceptor<any, any> {
-  throw new Error('Function not implemented.');
+
+  @Post(':id/like')
+  createMovieLike(
+    @Param('id', ParseIntPipe) movieId: number,
+    @UserId() userId: number,
+  ) {
+    return this.movieService.toggleMovieLike(movieId, userId, true);
+  }
+
+  @Post(':id/dislike')
+  createMovieDislike(
+    @Param('id', ParseIntPipe) movieId: number,
+    @UserId() userId: number,
+  ) {
+    return this.movieService.toggleMovieLike(movieId, userId, false);
+  }
 }

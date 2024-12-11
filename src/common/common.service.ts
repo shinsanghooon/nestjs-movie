@@ -26,7 +26,6 @@ export class CommonService {
     if (cursor) {
       const decodedCursor = Buffer.from(cursor, 'base64').toString('utf-8');
       const cursorObj = JSON.parse(decodedCursor);
-      console.log(cursorObj);
 
       order = cursorObj.order;
 
@@ -40,8 +39,6 @@ export class CommonService {
         : '>';
 
       const whereConditions = columns.map((c) => `${qb.alias}.${c}`).join(',');
-
-      console.log(whereConditions);
 
       const whereParams = columns.map((c) => `:${c}`).join(',');
 

@@ -28,9 +28,6 @@ export class BearerTokenMiddleware implements NestMiddleware {
 
       const decodedPayload = this.jwtService.decode(token);
 
-      console.log(decodedPayload);
-      console.log(decodedPayload.type);
-
       const secretKey =
         decodedPayload.type == 'refresh'
           ? envVariableKeys.refreshTokenSecret

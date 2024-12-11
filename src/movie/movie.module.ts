@@ -1,17 +1,30 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'src/common/common.module';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
+import { User } from 'src/user/entities/user.entity';
 import { MovieDetail } from './entity/movie-detail.entity';
+import { MovieUserLike } from './entity/movie-user-like.entity';
 import { Movie } from './entity/movie.entity';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Movie, MovieDetail, Director, Genre]),
+    TypeOrmModule.forFeature([
+      Movie,
+      MovieDetail,
+      Director,
+      Genre,
+      User,
+      MovieUserLike,
+    ]),
     CommonModule,
+    CacheModule.register({
+      ttl: 3000,
+    }),
     // MulterModule.register({
     //   storage: diskStorage({
     //     destination: join(process.cwd(), 'public', 'movie'),

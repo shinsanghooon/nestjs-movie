@@ -23,6 +23,7 @@ import { Director } from './director/entity/director.entity';
 import { Genre } from './genre/entity/genre.entity';
 import { GenreModule } from './genre/genre.module';
 import { MovieDetail } from './movie/entity/movie-detail.entity';
+import { MovieUserLike } from './movie/entity/movie-user-like.entity';
 import { Movie } from './movie/entity/movie.entity';
 import { MovieModule } from './movie/movie.module';
 import { User } from './user/entities/user.entity';
@@ -55,7 +56,7 @@ import { UserModule } from './user/user.module';
         username: configService.get<string>(envVariableKeys.dbUsername),
         password: configService.get<string>(envVariableKeys.dbPassword),
         database: configService.get<string>(envVariableKeys.dbDatabase),
-        entities: [Movie, MovieDetail, Director, Genre, User],
+        entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike],
         synchronize: true,
       }),
       inject: [ConfigService],
