@@ -1,13 +1,24 @@
-import { Controller, Get, Headers, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiBasicAuth, ApiBearerAuth } from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
+import { Authorization } from './decorator/authorization.decorator';
 import { Public } from './decorator/public.decorator';
 import { LocalAuthGuard } from './strategy/local.strategy';
 
 @Controller('auth')
+@ApiBearerAuth()
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -17,13 +28,14 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  async registerUser(@Headers('authorization') token: string) {
+  async registerUser(@Authorization() token: string) {
     return this.authService.register(token);
   }
 
   @Public()
+  @ApiBasicAuth()
   @Post('login')
-  async loginUser(@Headers('authorization') token: string) {
+  async loginUser(@Authorization() token: string) {
     return this.authService.login(token);
   }
 
@@ -40,6 +52,11 @@ export class AuthController {
   @Get('private')
   async private(@Req() req) {
     return req.user;
+  }
+
+  @Post('token/block')
+  blockToken(@Body('token') token: string) {
+    return this.authService.tokenBlock(token);
   }
 
   @Post('token/access')

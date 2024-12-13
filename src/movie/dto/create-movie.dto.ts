@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayNotEmpty,
@@ -9,23 +10,43 @@ import {
 
 export class CreateMovieDto {
   @IsNotEmpty()
+  @ApiProperty({
+    description: '영화 제목',
+    example: '겨울 왕국',
+  })
   title: string;
 
   @IsNotEmpty()
   @IsString()
+  @ApiProperty({
+    description: '영화 설명',
+    example: '추운 겨울 애니메이션',
+  })
   detail: string;
 
   @IsNotEmpty()
   @IsNumber()
+  @ApiProperty({
+    description: '감독 객체 ID',
+    example: '1',
+  })
   directorId: number;
 
   @IsArray()
   @ArrayNotEmpty()
   @IsNumber({}, { each: true })
   @Type(() => Number)
+  @ApiProperty({
+    description: '장르 IDs',
+    example: [1, 2, 3],
+  })
   genreIds: number[];
 
   @IsString()
   @Transform(({ value }) => `http://localhost:3000/${value}`)
+  @ApiProperty({
+    description: '영화 파일 이름',
+    example: 'aaa-bbb-ccc-ddd.jpg',
+  })
   movieFileName: string;
 }

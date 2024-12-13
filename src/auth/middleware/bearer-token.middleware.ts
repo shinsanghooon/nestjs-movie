@@ -1,6 +1,7 @@
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BadRequestException,
+  ForbiddenException,
   Inject,
   Injectable,
   NestMiddleware,
@@ -28,16 +29,21 @@ export class BearerTokenMiddleware implements NestMiddleware {
       return;
     }
 
+    const token = this.validateBearerToken(authHeader);
+
+    const blockToken = await this.cacheManager.get(`BLOCK_${token}`);
+    if (blockToken) {
+      throw new ForbiddenException('차단된 토큰입니다.');
+    }
+
+    const cachedPayload = await this.cacheManager.get(`TOKEN_${token}`);
+    if (cachedPayload) {
+      req.user = cachedPayload;
+    }
+
+    const decodedPayload = this.jwtService.decode(token);
+
     try {
-      const token = this.validateBearerToken(authHeader);
-
-      const cachedPayload = await this.cacheManager.get(`TOKEN_${token}`);
-      if (cachedPayload) {
-        req.user = cachedPayload;
-      }
-
-      const decodedPayload = this.jwtService.decode(token);
-
       const secretKey =
         decodedPayload.type == 'refresh'
           ? envVariableKeys.refreshTokenSecret
