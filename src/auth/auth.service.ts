@@ -11,12 +11,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { envVariableKeys } from 'src/common/const/env.const';
 import { Role, User } from 'src/user/entities/user.entity';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private userService: UserService,
     private configService: ConfigService,
     private jwtService: JwtService,
 
@@ -49,30 +51,9 @@ export class AuthService {
   async register(rawToken: string) {
     const { email, password } = this.parseBasicToken(rawToken);
 
-    const user = await this.userRepository.findOne({
-      where: {
-        email,
-      },
-    });
-
-    if (user) {
-      throw new BadRequestException('User already exists');
-    }
-
-    const hash = await bcrypt.hash(
-      password,
-      await this.configService.get<number>(envVariableKeys.hashRounds),
-    );
-
-    await this.userRepository.save({
+    return this.userService.create({
       email,
-      password: hash,
-    });
-
-    this.userRepository.findOne({
-      where: {
-        email,
-      },
+      password,
     });
   }
 
