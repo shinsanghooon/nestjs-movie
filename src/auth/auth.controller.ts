@@ -9,9 +9,6 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBasicAuth, ApiBearerAuth } from '@nestjs/swagger';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { Authorization } from './decorator/authorization.decorator';
 import { Public } from './decorator/public.decorator';
@@ -22,9 +19,7 @@ import { LocalAuthGuard } from './strategy/local.strategy';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    @InjectRepository(User)
-    private userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   @Public()
   @Post('register')
