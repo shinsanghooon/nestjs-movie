@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { DirectorService } from './director.service';
 import { CreateDirectorDto } from './dto/create-director.dto';
 import { UpdateDirectorDto } from './dto/update-director.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('director')
 @ApiBearerAuth()
 export class DirectorController {
-  constructor(private readonly directorService: DirectorService) {}
+  constructor(private readonly directorService: DirectorService) { }
 
   @Post()
   create(@Body() createDirectorDto: CreateDirectorDto) {
@@ -20,17 +20,17 @@ export class DirectorController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.directorService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDirectorDto: UpdateDirectorDto) {
+  update(@Param('id') id: number, @Body() updateDirectorDto: UpdateDirectorDto) {
     return this.directorService.update(+id, updateDirectorDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.directorService.remove(+id);
   }
 }
