@@ -11,12 +11,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
-import { WinstonModule } from 'nest-winston';
 import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { RBACGuard } from './auth/guard/rbac.guard';
 import { BearerTokenMiddleware } from './auth/middleware/bearer-token.middleware';
+import { ChatModule } from './chat/chat.module';
 import { envVariableKeys } from './common/const/env.const';
 import { QueryFailedErrorExceptionFilter } from './common/filter/query-failed.filter';
 import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
@@ -32,7 +32,10 @@ import { MovieModule } from './movie/movie.module';
 import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 
+import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import { ChatRoom } from './chat/entity/chat-room.entity';
+import { Chat } from './chat/entity/chat.entity';
 
 @Module({
   imports: [
@@ -61,7 +64,7 @@ import * as winston from 'winston';
         username: configService.get<string>(envVariableKeys.dbUsername),
         password: configService.get<string>(envVariableKeys.dbPassword),
         database: configService.get<string>(envVariableKeys.dbDatabase),
-        entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike],
+        entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike, Chat, ChatRoom],
         synchronize: true,
       }),
       inject: [ConfigService],
@@ -71,6 +74,7 @@ import * as winston from 'winston';
     GenreModule,
     AuthModule,
     UserModule,
+    ChatModule,
     WinstonModule.forRoot({
       level: 'debug',
       transports: [
@@ -96,6 +100,7 @@ import * as winston from 'winston';
       ttl: 0,
       isGlobal: true,
     }),
+    ChatModule,
   ],
   providers: [
     // 순서가 중요함

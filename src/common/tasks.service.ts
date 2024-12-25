@@ -18,13 +18,13 @@ export class TasksService {
 
     @Inject(WINSTON_MODULE_NEST_PROVIDER)
     private readonly logger: LoggerService,
-  ) {}
+  ) { }
 
-  @Cron('*/5 * * * * *')
-  logEverySecond() {
-    this.logger.log('5초마다 실행!', TasksService.name);
-    this.logger.warn('5초마다 경고!');
-  }
+  // @Cron('*/5 * * * * *')
+  // logEverySecond() {
+  //   this.logger.log('5초마다 실행!', TasksService.name);
+  //   this.logger.warn('5초마다 경고!');
+  // }
 
   async eraseOrphanfiles() {
     const files = await readdir(join(process.cwd(), 'public', 'temp'));
