@@ -10,7 +10,7 @@ export class GenreService {
   constructor(
     @InjectRepository(Genre)
     private readonly genreRepository: Repository<Genre>,
-  ) {}
+  ) { }
 
   create(createGenreDto: CreateGenreDto) {
     return this.genreRepository.save(createGenreDto);

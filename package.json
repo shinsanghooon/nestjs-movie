@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "test:user": "jest --testPathPattern=src/user --verbose --detectOpenHandles --colors",
     "test:auth": "jest --testPathPattern=src/auth --verbose --detectOpenHandles --colors --coverage --collectCoverageFrom=src/auth/**",
-    "test:director": "jest --testPathPattern=src/director --verbose --detectOpenHandles --colors --coverage --collectCoverageFrom=src/director/**"
+    "test:director": "jest --testPathPattern=src/director --verbose --detectOpenHandles --colors --coverage --collectCoverageFrom=src/director/**",
+    "test:genre": "jest --testPathPattern=src/genre --verbose --detectOpenHandles --colors --coverage --collectCoverageFrom=src/genre/**"
   },
   "dependencies": {
     "@nestjs/cache-manager": "2.2.2",
