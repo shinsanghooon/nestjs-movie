@@ -15,6 +15,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -36,7 +37,7 @@ import { MovieService } from './movie.service';
 @ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class MovieController {
-  constructor(private readonly movieService: MovieService) {}
+  constructor(private readonly movieService: MovieService) { }
 
   @Public()
   @Get()
@@ -75,7 +76,20 @@ export class MovieController {
     @Param('id', ParseIntPipe)
     id: number,
     @Query('test', new DefaultValuePipe(10)) test: number,
+    @Req() request: any
   ) {
+
+    const session = request.session;
+
+    const movieCount = session.movieCount ?? {};
+
+    request.session.movieCount = {
+      ...movieCount,
+      [id]: movieCount[id] ? movieCount[id] + 1 : 1
+    }
+
+    console.log(session);
+
     return this.movieService.getMovieById(id);
   }
 

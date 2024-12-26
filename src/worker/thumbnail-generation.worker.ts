@@ -20,7 +20,7 @@ export class ThumbnailGenerationProcess extends WorkerHost {
             .screenshots({
                 count: 1,
                 folder: outputDirectory,
-                filename: `${videoId}.png`, // <-- 여기서 filename 으로 표기
+                fileName: `${videoId}.png`, // <-- 여기서 filename 으로 표기
                 size: '320x240'
             })
             .on('end', () => {

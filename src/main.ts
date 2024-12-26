@@ -2,6 +2,7 @@ import * as ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as session from 'express-session';
 import * as ffmpegProbe from 'ffprobe-static';
 import * as ffmpegFluent from 'fluent-ffmpeg';
 import { AppModule } from './app.module';
@@ -37,6 +38,12 @@ async function bootstrap() {
       },
     }),
   );
+
+  app.use(
+    session({
+      secret: 'secret',
+    })
+  )
 
   await app.listen(process.env.PORT ?? 3000);
 }
