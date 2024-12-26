@@ -5,7 +5,7 @@ import {
   NestModule,
   RequestMethod,
 } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConditionalModule, ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -36,6 +36,7 @@ import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
 import { ChatRoom } from './chat/entity/chat-room.entity';
 import { Chat } from './chat/entity/chat.entity';
+import { WorkerModule } from './worker/worker.module';
 
 @Module({
   imports: [
@@ -75,6 +76,10 @@ import { Chat } from './chat/entity/chat.entity';
     AuthModule,
     UserModule,
     ChatModule,
+    ConditionalModule.registerWhen(
+      WorkerModule,
+      (env: NodeJS.ProcessEnv) => env['TYPE'] === 'worker',
+    ), // 워커 모드 일때만 실행되도록 해야한다. 
     WinstonModule.forRoot({
       level: 'debug',
       transports: [

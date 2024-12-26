@@ -1,3 +1,4 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -28,9 +29,21 @@ import { TasksService } from './tasks.service';
       }),
     }),
     TypeOrmModule.forFeature([Movie]),
+    BullModule.forRoot({
+      connection: {
+        host: 'redis-15605.c340.ap-northeast-2-1.ec2.redns.redis-cloud.com',
+        port: 15605,
+        username: 'default',
+        password: 'rPpdlWPLsTDbQaqPwjIYclq00HzANnYt',
+      }
+    }),
+    BullModule.registerQueue({
+      name: 'thumbnail-generation',
+
+    })
   ],
   controllers: [CommonController],
   providers: [CommonService, TasksService, DefaultLogger],
   exports: [CommonService, DefaultLogger],
 })
-export class CommonModule {}
+export class CommonModule { }

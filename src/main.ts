@@ -1,7 +1,13 @@
+import * as ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as ffmpegProbe from 'ffprobe-static';
+import * as ffmpegFluent from 'fluent-ffmpeg';
 import { AppModule } from './app.module';
+
+ffmpegFluent.setFfmpegPath(ffmpeg.path)
+ffmpegFluent.setFfprobePath(ffmpegProbe.path)
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
